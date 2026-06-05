@@ -8,7 +8,7 @@ import BrandSection from '@/components/BrandSection'
 import FAQAccordion from '@/components/FAQAccordion'
 import HeroVideo from '@/components/HeroVideo'
 import ScrollReveal from '@/components/ScrollReveal'
-import { getProducts } from '@/lib/shopify'
+import { getInStockProducts } from '@/lib/shopify'
 
 const stats = [
   { value: '500+', label: 'Swedish SKUs' },
@@ -79,7 +79,7 @@ const tiers = [
 ]
 
 export default async function Home() {
-  const products = await getProducts(8).catch(() => [])
+  const products = await getInStockProducts().catch(() => [])
   const featuredProducts = products.slice(0, 8)
 
   return (

@@ -48,27 +48,17 @@ const PRODUCT_FIELDS = `
   priceRange { minVariantPrice { amount currencyCode } }
 `
 
-export async function getProducts(first = 6): Promise<ShopifyProduct[]> {
+// Only products Shopify reports as in stock / available for sale.
+// `available_for_sale:true` filters server-side, so out-of-stock items
+// (and any with no purchasable variant) never reach the catalog.
+export async function getInStockProducts(first = 250): Promise<ShopifyProduct[]> {
   const { data, errors } = await shopify.request(`
-    query Products($first: Int!) {
-      products(first: $first) {
-        nodes { ${PRODUCT_FIELDS} }
-      }
-    }
-  `, { variables: { first } })
-
-  if (errors) return []
-  return data?.products?.nodes ?? []
-}
-
-export async function getProductsByTag(tag: string, first = 50): Promise<ShopifyProduct[]> {
-  const { data, errors } = await shopify.request(`
-    query ProductsByTag($query: String!, $first: Int!) {
+    query InStockProducts($query: String!, $first: Int!) {
       products(first: $first, query: $query) {
         nodes { ${PRODUCT_FIELDS} }
       }
     }
-  `, { variables: { query: `tag:${tag}`, first } })
+  `, { variables: { query: 'available_for_sale:true', first } })
 
   if (errors) return []
   return data?.products?.nodes ?? []
